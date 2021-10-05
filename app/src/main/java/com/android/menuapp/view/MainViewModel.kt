@@ -5,6 +5,8 @@ import android.content.Entity
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.menuapp.model.BaseModel
@@ -17,19 +19,21 @@ import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.stream.Collectors
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    val gson: Gson
+    private val gson: Gson
 ) : ViewModel() {
 
-    val fileName = "data.json"
+    private val fileName = "data.json"
     lateinit var menu: BaseModel
-    var foods = ArrayList<Fields>()
-    var daysOfFood = ArrayList<Map<String, List<Fields>>>()
+    private var foods = ArrayList<Fields>()
+    var menuByDate = ArrayList<Pair<Date, List<Fields>>>()
 
+    @RequiresApi(Build.VERSION_CODES.N)
     fun convertJsonToObject(context: Context, result: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
@@ -38,18 +42,27 @@ class MainViewModel @Inject constructor(
                 val bufferData = ByteArray(sizeOfFile)
                 iStream.read(bufferData)
                 iStream.close()
-                var json = String(bufferData)
+                val json = String(bufferData)
                 menu = gson.fromJson(json, BaseModel::class.java)
 
                 menu.value.forEach {
                     foods.add((it.fields))
                 }
+                var dates = (foods.stream().collect(Collectors.groupingBy { it.getDay() })).toList()
+                    .map { it.first }
+                dates = dates.sortedBy { it }
 
-                Collections.sort(foods, Comparator.comparing(Fields::itemStartDate))
-                Log.e("sss", "foods: $foods")
-                result(true)
+                dates.forEach { date ->
+                    menuByDate.add(Pair(date, foods.filter { it.getDay() == date }))
+                }
+
+
+
+
+                result.invoke(true)
+                Log.e("sss", "list$menuByDate")
             } catch (e: IOException) {
-                result(false)
+                result.invoke(false)
                 Log.e("sss", "error converting json: $e")
             }
         }
