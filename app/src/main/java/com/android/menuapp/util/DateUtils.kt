@@ -4,10 +4,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object DateUtils {
-    private val apiDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-    private val dayFormat = SimpleDateFormat("EEEE", Locale.US)
-    private val dayNumberFormat = SimpleDateFormat("dd", Locale.US)
-    private val monthFormat = SimpleDateFormat("MMMM", Locale.US)
+    private val locale = Locale("tr", "TR")
+    private val apiDateFormat = SimpleDateFormat("yyyy-MM-dd", locale)
+    private val dayFormat = SimpleDateFormat("EEEE", locale)
+    private val dayNumberFormat = SimpleDateFormat("dd", locale)
+    private val monthFormat = SimpleDateFormat("MMMM", locale)
 
     fun convertApiDateStringToDate(apiDate: String?): Date {
         return apiDateFormat.parse(apiDate)

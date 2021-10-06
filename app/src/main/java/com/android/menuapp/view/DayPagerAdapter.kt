@@ -39,12 +39,17 @@ class DayPagerAdapter(
             layoutInflater.inflate(R.layout.item_day_pager, container, false) as ViewGroup
         val containerView: LinearLayout = view.findViewById(R.id.llItemDayPager)
 
-        val item = list?.get(position)
-        val categories = item?.second?.groupBy { it.foodCategory }?.toList()?.sortedBy { it.first }
+        val categories = list?.get(position)?.second?.groupBy { it.foodCategory }?.toList()
+            ?.sortedBy { it.first }
+
         categories?.forEach { category ->
-            val textview = TextView(context)
-            textview.text = category.first
-            containerView.addView(textview)
+
+            val title: TextView =
+                layoutInflater.inflate(R.layout.item_menu_title, container, false) as TextView
+            title.text = category.first
+            containerView.addView(title)
+
+
             category.second.forEach {
                 containerView.addView(createFoodItem(layoutInflater, container, it))
             }
@@ -62,8 +67,10 @@ class DayPagerAdapter(
     ): View {
         val view: ViewGroup =
             layoutInflater.inflate(R.layout.item_menu_food, container, false) as ViewGroup
+
         view.findViewById<TextView>(R.id.tvItemMenuFoodTitle).text = field.title
-        view.findViewById<TextView>(R.id.tvItemMenuFoodKcal).text = field.calorie.toString()
+        view.findViewById<TextView>(R.id.tvItemMenuFoodKcal).text =
+            field.calorie.toString().plus(" Kl")
         return view
     }
 }

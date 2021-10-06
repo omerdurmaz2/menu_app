@@ -9,5 +9,7 @@
     <color name="gray">#2f2b2a</color>
     <color name="white">#FFFFFFFF</color>
     <color name="red">#e60000</color>
+    <color name="textRed">#e43e3c</color>
+    <color name="textGray">#c2c2c2</color>
     <color name="low_opacity_red">#BFE60000</color>
 </resources>

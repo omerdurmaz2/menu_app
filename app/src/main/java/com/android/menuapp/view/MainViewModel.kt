@@ -30,10 +30,9 @@ class MainViewModel @Inject constructor(
 
     private val fileName = "data.json"
     lateinit var menu: BaseModel
-    private var foods = ArrayList<Fields>()
     var menuByDate = ArrayList<Pair<Date, List<Fields>>>()
-
-    @RequiresApi(Build.VERSION_CODES.N)
+    var vpPositionLive = MutableLiveData<Int>().apply { value = 0 }
+    var vpPosition = 0
     fun convertJsonToObject(context: Context, result: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
@@ -44,12 +43,11 @@ class MainViewModel @Inject constructor(
                 iStream.close()
                 val json = String(bufferData)
                 menu = gson.fromJson(json, BaseModel::class.java)
-
+                val foods = ArrayList<Fields>()
                 menu.value.forEach {
                     foods.add((it.fields))
                 }
-                var dates = (foods.stream().collect(Collectors.groupingBy { it.getDay() })).toList()
-                    .map { it.first }
+                var dates = foods.groupBy { it.getDay() }.toList().map { it.first }
                 dates = dates.sortedBy { it }
 
                 dates.forEach { date ->
